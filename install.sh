@@ -100,38 +100,45 @@ apply_fix() {
         # 创建临时文件用于插入代码
         local temp_file=$(mktemp)
 
-        # 读取文件并在 deliver 函数开头插入代码
-        awk '
-        /deliver: async \(payload: ReplyPayload, info\) => \{/ {
-            print $0
-            print ""
-            print "        // 先发送媒体（图片/文件）- 由 openclaw-feishu-media-fixer 自动添加"
-            print "        if (payload.mediaUrls?.length) {"
-            print "          for (const mediaUrl of payload.mediaUrls) {"
-            print "            try {"
-            print "              await sendMediaFeishu({"
-            print "                cfg,"
-            print "                to: chatId,"
-            print "                mediaUrl,"
-            print "                replyToMessageId,"
-            print "                accountId,"
-            print "              });"
-            print "              params.runtime.log?.(\`feishu[\${account.accountId}]: sent media: \${mediaUrl}\`);"
-            print "            } catch (error) {"
-            print "              params.runtime.error?.("
-            print "                \`feishu[\${account.accountId}]: failed to send media \${mediaUrl}: \${String(error)}\`,"
-            print "              );"
-            print "            }"
-            print "          }"
-            print "        }"
-            print ""
-            next
+        # 媒体发送代码（使用变量避免转义问题）
+        local media_code='        // 先发送媒体（图片/文件）- 由 openclaw-feishu-media-fixer 自动添加
+        if (payload.mediaUrls?.length) {
+          for (const mediaUrl of payload.mediaUrls) {
+            try {
+              await sendMediaFeishu({
+                cfg,
+                to: chatId,
+                mediaUrl,
+                replyToMessageId,
+                accountId,
+              });
+              params.runtime.log?.(`feishu[${account.accountId}]: sent media: ${mediaUrl}`);
+            } catch (error) {
+              params.runtime.error?.(
+                `feishu[${account.accountId}]: failed to send media ${mediaUrl}: ${String(error)}`,
+              );
+            }
+          }
         }
-        { print }
-        ' "$TARGET_FILE" > "$temp_file"
+'
 
-        mv "$temp_file" "$TARGET_FILE"
-        log_success "已添加媒体发送逻辑"
+        # 使用 sed 在 deliver 函数后插入代码
+        # 先找到 deliver 函数行，然后在下一行插入代码
+        local deliver_line=$(grep -n "deliver: async (payload: ReplyPayload, info) => {" "$TARGET_FILE" | head -1 | cut -d: -f1)
+
+        if [[ -n "$deliver_line" ]]; then
+            # 创建临时文件
+            head -n "$deliver_line" "$TARGET_FILE" > "$temp_file"
+            echo "" >> "$temp_file"
+            echo "$media_code" >> "$temp_file"
+            tail -n +$((deliver_line + 1)) "$TARGET_FILE" >> "$temp_file"
+            mv "$temp_file" "$TARGET_FILE"
+            log_success "已添加媒体发送逻辑"
+        else
+            log_error "未找到 deliver 函数"
+            rm -f "$temp_file"
+            return 1
+        fi
     fi
 
     log_success "修复完成！"
