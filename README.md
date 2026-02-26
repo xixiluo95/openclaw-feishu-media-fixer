@@ -46,10 +46,10 @@ OpenClaw: 好的主人～ [图片] 这张怎么样？💕
 
 ```bash
 # 找到最新的备份文件
-ls -la ~/.openclaw/backups/
+ls -la ~/.openclaw-feishu-fixer/backups/
 
 # 恢复备份（替换时间戳）
-cp ~/.openclaw/backups/reply-dispatcher.ts.backup.YYYYMMDD_HHMMSS \
+cp ~/.openclaw-feishu-fixer/backups/reply-dispatcher.ts.backup.YYYYMMDD_HHMMSS \
    ~/.npm-global/lib/node_modules/openclaw/extensions/feishu/src/reply-dispatcher.ts
 
 # 重启服务

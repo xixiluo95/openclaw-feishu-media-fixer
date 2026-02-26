@@ -106,7 +106,7 @@ export function pathExists(filePath: string): boolean {
  * @returns 备份目录路径
  */
 export function getDefaultBackupDir(): string {
-  return path.join(os.homedir(), '.openclaw', 'backups');
+  return path.join(os.homedir(), '.openclaw-feishu-fixer', 'backups');
 }
 
 /**
