@@ -165,7 +165,9 @@ apply_fix() {
 }
 
 # 重启服务
+# 参数: $1 - 备份文件路径（用于失败时恢复）
 restart_service() {
+    local backup_file="$1"
     log_info "正在重启 OpenClaw Gateway 服务..."
 
     if systemctl --user is-active openclaw-gateway.service &>/dev/null; then
@@ -182,9 +184,17 @@ restart_service() {
             ((count++))
         done
 
-        log_warn "服务重启超时，请手动检查"
+        # 服务重启超时，尝试恢复备份
+        log_error "服务重启超时"
+        if [[ -n "$backup_file" && -f "$backup_file" ]]; then
+            log_warn "正在恢复原始文件..."
+            cp "$backup_file" "$TARGET_FILE"
+            log_info "已恢复原始文件，请手动检查服务状态"
+        fi
+        return 1
     else
-        log_warn "OpenClaw Gateway 服务未运行"
+        log_warn "OpenClaw Gateway 服务未运行，跳过重启"
+        return 0
     fi
 }
 
@@ -259,7 +269,17 @@ main() {
     fi
 
     # 7. 重启服务
-    restart_service
+    if ! restart_service "$backup_file"; then
+        echo ""
+        echo "╔════════════════════════════════════════════════════════════╗"
+        echo "║                    ⚠️  服务重启失败                        ║"
+        echo "╠════════════════════════════════════════════════════════════╣"
+        echo "║  已恢复原始文件，请手动检查服务状态：                      ║"
+        echo "║  systemctl --user status openclaw-gateway.service          ║"
+        echo "╚════════════════════════════════════════════════════════════╝"
+        echo ""
+        exit 1
+    fi
 
     # 8. 完成
     echo ""
