@@ -55,7 +55,7 @@ detect_openclaw_path() {
 
 # 目标文件路径
 TARGET_FILE=""
-BACKUP_DIR="$HOME/.openclaw/backups"
+BACKUP_DIR="$HOME/.openclaw-feishu-fixer/backups"
 
 # 检查是否已修复
 check_if_fixed() {
@@ -70,6 +70,26 @@ check_if_fixed() {
         echo "fixed"
     else
         echo "not_fixed"
+    fi
+}
+
+# 检查版本兼容性
+check_version() {
+    local pkg_file="$1/package.json"
+    if [[ -f "$pkg_file" ]]; then
+        local version=$(grep '"version"' "$pkg_file" | head -1 | sed 's/.*"version": *"\([^"]*\)".*/\1/')
+        log_info "OpenClaw 版本: $version"
+
+        # 检查是否是 2026.2.x 版本
+        if [[ ! "$version" =~ ^2026\.2\. ]]; then
+            log_warn "版本兼容性警告：此工具针对 OpenClaw 2026.2.x 版本设计"
+            log_warn "当前版本 $version 可能不兼容，继续可能导致问题"
+            read -p "是否继续？(y/N) " -n 1 -r
+            echo
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                exit 1
+            fi
+        fi
     fi
 }
 
@@ -188,7 +208,10 @@ main() {
 
     log_success "找到 OpenClaw: $openclaw_path"
 
-    # 2. 检查目标文件
+    # 2. 检查版本兼容性
+    check_version "$openclaw_path"
+
+    # 3. 检查目标文件
     TARGET_FILE="$openclaw_path/extensions/feishu/src/reply-dispatcher.ts"
 
     if [[ ! -f "$TARGET_FILE" ]]; then
