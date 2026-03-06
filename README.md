@@ -1,12 +1,35 @@
-# OpenClaw 飞书图片发送修复工具
+<div align="center">
 
-一键修复 OpenClaw 无法发送图片到飞书的问题。
+# 🔧 OpenClaw 飞书图片发送修复工具
 
-## 问题说明
+**一键修复 OpenClaw 无法发送图片到飞书的问题**
+
+[![Author](https://img.shields.io/badge/Author-RuPengYang-blue?style=for-the-badge&logo=github)](https://github.com/xixiluo95)
+[![GitHub](https://img.shields.io/badge/GitHub-Open%20Source-black?style=for-the-badge&logo=github)](https://github.com/xixiluo95/openclaw-feishu-media-fixer)
+[![Stars](https://img.shields.io/github/stars/xixiluo95/openclaw-feishu-media-fixer?style=for-the-badge&color=yellow)](https://github.com/xixiluo95/openclaw-feishu-media-fixer/stargazers)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+
+</div>
+
+---
+
+## 👤 作者
+
+**RuPengYang**
+
+- 🔗 GitHub: [@xixiluo95](https://github.com/xixiluo95)
+- 📦 仓库: [openclaw-feishu-media-fixer](https://github.com/xixiluo95/openclaw-feishu-media-fixer)
+- ⭐ 如果这个项目帮到了你，请点个 Star 支持一下！
+
+---
+
+## 📖 问题说明
 
 OpenClaw 的飞书 channel 在处理 `MEDIA:` 语法时，`reply-dispatcher.ts` 中的 `deliver` 函数只处理 `payload.text`，没有处理 `payload.mediaUrls`，导致图片无法发送到飞书。
 
-## 一键修复
+---
+
+## 🚀 一键修复
 
 **只需执行一条命令：**
 
@@ -20,18 +43,24 @@ curl -fsSL https://raw.githubusercontent.com/xixiluo95/openclaw-feishu-media-fix
 wget -qO- https://raw.githubusercontent.com/xixiluo95/openclaw-feishu-media-fixer/main/install.sh | bash
 ```
 
-## 修复过程
+---
+
+## ✅ 修复过程
 
 脚本会自动完成以下操作：
 
-1. ✅ 检测 OpenClaw 安装路径
-2. ✅ 检查是否需要修复
-3. ✅ 创建备份文件
-4. ✅ 应用修复补丁
-5. ✅ 验证修复结果
-6. ✅ 重启 OpenClaw Gateway 服务
+| 步骤 | 描述 |
+|------|------|
+| 1️⃣ | 检测 OpenClaw 安装路径 |
+| 2️⃣ | 检查是否需要修复 |
+| 3️⃣ | 创建备份文件 |
+| 4️⃣ | 应用修复补丁 |
+| 5️⃣ | 验证修复结果 |
+| 6️⃣ | 重启 OpenClaw Gateway 服务 |
 
-## 修复效果
+---
+
+## 🎉 修复效果
 
 修复后，OpenClaw 可以正确发送图片到飞书：
 
@@ -40,7 +69,9 @@ wget -qO- https://raw.githubusercontent.com/xixiluo95/openclaw-feishu-media-fixe
 OpenClaw: 好的主人～ [图片] 这张怎么样？💕
 ```
 
-## 撤销修复
+---
+
+## ↩️ 撤销修复
 
 如果需要撤销修复，恢复原始代码：
 
@@ -50,13 +81,15 @@ ls -la ~/.openclaw-feishu-fixer/backups/
 
 # 恢复备份（替换时间戳）
 cp ~/.openclaw-feishu-fixer/backups/reply-dispatcher.ts.backup.YYYYMMDD_HHMMSS \
-   ~/.npm-global/lib/node_modules/openclaw/extensions/feishu/src/reply-dispatcher.ts
+ ~/.npm-global/lib/node_modules/openclaw/extensions/feishu/src/reply-dispatcher.ts
 
 # 重启服务
 systemctl --user restart openclaw-gateway.service
 ```
 
-## 技术细节
+---
+
+## 🔧 技术细节
 
 ### 修复的文件
 `~/.npm-global/lib/node_modules/openclaw/extensions/feishu/src/reply-dispatcher.ts`
@@ -91,12 +124,24 @@ if (payload.mediaUrls?.length) {
 }
 ```
 
-## 兼容性
+---
 
-- OpenClaw 2026.2.x
-- Linux (systemd)
-- Node.js 18+
+## 💻 兼容性
 
-## 许可证
+- ✅ OpenClaw 2026.2.x
+- ✅ Linux (systemd)
+- ✅ Node.js 18+
 
-MIT
+---
+
+## 📜 许可证
+
+[MIT](LICENSE) © RuPengYang
+
+---
+
+<div align="center">
+
+**Made with ❤️ by [RuPengYang](https://github.com/xixiluo95)**
+
+</div>
